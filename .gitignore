@@ -120,3 +120,8 @@ update.py
 # Local planning / commit helpers (not published)
 PROJECT_BOARD.md
 scripts/*commits*.sh
+
+# Captured results carried into the book for cells that cannot run in the
+# browser. These are content, not build output, so they are tracked.
+!jb/figures/
+!jb/figures/**
