@@ -36,6 +36,7 @@ an already-prepared directory.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 
@@ -49,7 +50,34 @@ def load_notebook(name: str) -> dict:
         return json.load(stream)
 
 
+def ensure_cell_ids(notebook: dict) -> None:
+    """Give every cell an ``id`` when the notebook's format requires one.
+
+    nbformat 4.5 made cell ids mandatory, so a cell inserted into a 4.5
+    notebook without one leaves the file failing schema validation. The id is
+    derived from the cell's own source rather than drawn at random, so a
+    rebuild of an unchanged notebook produces a byte-identical file.
+    """
+    if notebook.get("nbformat_minor", 0) < 5:
+        return
+    taken = {cell["id"] for cell in notebook["cells"] if "id" in cell}
+    for cell in notebook["cells"]:
+        if "id" in cell:
+            continue
+        digest = hashlib.sha1(source_of(cell).encode("utf-8")).hexdigest()
+        candidate = digest[:8]
+        salt = 0
+        while candidate in taken:
+            salt += 1
+            candidate = hashlib.sha1(
+                f"{salt}:{source_of(cell)}".encode("utf-8")
+            ).hexdigest()[:8]
+        cell["id"] = candidate
+        taken.add(candidate)
+
+
 def write_notebook(name: str, notebook: dict) -> None:
+    ensure_cell_ids(notebook)
     with (ROOT / name).open("w", encoding="utf-8", newline="\n") as stream:
         json.dump(notebook, stream, ensure_ascii=False, indent=1)
         stream.write("\n")
@@ -527,17 +555,30 @@ ADAPTERS = (
     adapt_cancer,
 )
 
-# How many cells each notebook is expected to end up with flagged. A count that
-# has moved means an upstream edit shifted something, and the marking needs
-# rereading rather than rerunning.
+# Where the flagged cells end up, salvage insertions included. Positions rather
+# than a count: a count still matches when a flag lands on the wrong cell, and a
+# flag on the wrong cell is the failure this catches.
 EXPECTED_MARKS = {
-    "hepatitis.ipynb": 16,
-    "bread.ipynb": 7,
-    "redline_pymc.ipynb": 37,
-    "hospital.ipynb": 18,
-    "chap19_v3.ipynb": 40,
-    "chap20.ipynb": 21,
-    "cancer.ipynb": 4,
+    "hepatitis.ipynb": [4, 6, 13, 16, 18, 19, 21, 23, 31, 32, 34, 35, 36, 38, 39, 42],
+    "bread.ipynb": [6, 24, 26, 29, 30, 31, 33],
+    "redline_pymc.ipynb": [
+        6, 21, 62, 63, 65, 66, 67, 68, 69, 71, 72, 73, 75, 78, 79, 80, 82, 84,
+        85, 87, 88, 89, 90, 92, 95, 100, 105, 109, 110, 113, 114, 115, 116,
+        120, 121, 122, 123,
+    ],
+    "hospital.ipynb": [
+        17, 18, 19, 21, 23, 25, 30, 31, 59, 60, 75, 76, 77, 93, 94, 95, 100, 102,
+    ],
+    "chap19_v3.ipynb": [
+        25, 28, 31, 32, 35, 38, 40, 43, 46, 48, 50, 52, 53, 55, 58, 60, 61, 65,
+        86, 89, 91, 93, 94, 96, 111, 113, 115, 117, 119, 121, 123, 128, 130,
+        134, 143, 144, 151, 152, 153, 154,
+    ],
+    "chap20.ipynb": [
+        65, 67, 69, 71, 73, 75, 77, 79, 82, 84, 86, 88, 90, 92, 96, 100, 101,
+        103, 105, 107, 109,
+    ],
+    "cancer.ipynb": [32, 62, 63, 64],
 }
 
 
@@ -549,9 +590,9 @@ def validate() -> None:
             for index, cell in enumerate(notebook["cells"])
             if cell.get("metadata", {}).get(REFERENCE_ONLY)
         ]
-        if len(marked) != expected:
+        if marked != expected:
             raise ValueError(
-                f"{name}: {len(marked)} cells flagged {REFERENCE_ONLY}, "
+                f"{name}: cells flagged {REFERENCE_ONLY} are {marked}, "
                 f"expected {expected}"
             )
         for index in marked:
@@ -580,7 +621,10 @@ def validate() -> None:
     # Two upstream corrections live in the canonical notebooks, not here. Assert
     # them so a stale copy in soln/ cannot quietly undo them on the next build.
     chap17 = source_of(load_notebook("chap17.ipynb")["cells"][74])
-    if "xlabel=r'$\\sigma$" not in chap17:
+    if (
+        "xlabel=r'$\\sigma$" not in chap17
+        or "title=r'Posterior marginal distribution of $\\sigma$'" not in chap17
+    ):
         raise ValueError("chap17.ipynb lost the raw LaTeX label strings")
     chap19 = "".join(
         source_of(cell)
@@ -594,6 +638,14 @@ def validate() -> None:
         notebook = json.loads(path.read_text(encoding="utf-8"))
         if notebook.get("nbformat") != 4:
             raise ValueError(f"{path.name} is not nbformat 4")
+        if notebook.get("nbformat_minor", 0) >= 5:
+            missing = [
+                index
+                for index, cell in enumerate(notebook["cells"])
+                if "id" not in cell
+            ]
+            if missing:
+                raise ValueError(f"{path.name}: cells {missing} have no id")
 
     print("notebook adaptations validated")
 
