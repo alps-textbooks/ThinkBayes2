@@ -32,6 +32,9 @@ cp ../soln/utils.py .
 # add tags to hide the solutions
 python prep_notebooks.py
 
+# adapt the copies for the in-browser runtime
+python prep_alps.py
+
 # build the HTML version
 jb build .
 
