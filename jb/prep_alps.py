@@ -558,6 +558,18 @@ ADAPTERS = (
 # Where the flagged cells end up, salvage insertions included. Positions rather
 # than a count: a count still matches when a flag lands on the wrong cell, and a
 # flag on the wrong cell is the failure this catches.
+# Imports no WebAssembly build can satisfy: each reaches Numba, which compiles
+# through LLVM. A cell containing one of these cannot execute in the browser
+# whatever its position in the notebook.
+UNAVAILABLE_IMPORTS = (
+    "import pymc",
+    "import pymc3",
+    "import arviz",
+    "import pymc_extras",
+    "from quantecon import",
+    "import quantecon",
+)
+
 EXPECTED_MARKS = {
     "hepatitis.ipynb": [4, 6, 13, 16, 18, 19, 21, 23, 31, 32, 34, 35, 36, 38, 39, 42],
     "bread.ipynb": [6, 24, 26, 29, 30, 31, 33],
@@ -615,6 +627,23 @@ def validate() -> None:
     cancer = load_notebook("cancer.ipynb")
     if "pd.read_html" in source_of(cancer["cells"][11]):
         raise ValueError("cancer.ipynb still reads the SEER export from disk")
+
+    # Positions alone do not catch an upstream edit that puts one of these
+    # imports into a cell that was runnable before: the cell count is
+    # unchanged, so the expected marks still match while the build ships a
+    # cell that cannot run. Read what each cell imports as well as where it is.
+    for name in EXPECTED_MARKS:
+        notebook = load_notebook(name)
+        for index, cell in enumerate(notebook["cells"]):
+            if cell.get("cell_type") != "code":
+                continue
+            source = source_of(cell)
+            needs = next((p for p in UNAVAILABLE_IMPORTS if p in source), None)
+            if needs and not cell.get("metadata", {}).get(REFERENCE_ONLY):
+                raise ValueError(
+                    f"{name}:cell[{index}] uses {needs!r}, which this runtime "
+                    f"cannot install, but is not flagged {REFERENCE_ONLY}"
+                )
     if "class MarkovChain" not in source_of(cancer["cells"][34]):
         raise ValueError("cancer.ipynb is missing the NumPy Markov chain")
 
