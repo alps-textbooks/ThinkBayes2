@@ -18,7 +18,7 @@ Marking
 
 Salvage
     Marking on its own would take whole notebooks down with the marked cells.
-    Three notebooks import PyMC in the middle of the same cell that imports
+    Four notebooks import PyMC in the middle of the same cell that imports
     NumPy, Pandas and ``utils``: the failed import costs them ``decorate`` and
     ``set_pyplot_params``, and every later figure fails with a NameError. Those
     imports are split into a cell of their own so the rest of the cell still
@@ -326,24 +326,25 @@ def adapt_hospital() -> bool:
         notebook,
         name,
         {
-            17: "import pymc3 as pm",
-            18: "%time model = make_model()",
-            19: "pred = pm.sample_prior_predictive(1000)",
-            21: "az.plot_posterior(trace, var_names=['mu', 'sigma'])",
-            23: "trace_xs = trace['xs'].transpose()",
-            25: "az.plot_posterior(trace_xs[0])",
-            30: "compare_cdf(prior_mu, pred['mu'])",
-            31: "compare_cdf(prior_sigma, pred['sigma'])",
-            59: "pred_xs = pred['xs'].transpose()",
-            60: "compare_cdf(marginal_x, pred_xs[0])",
-            75: "compare_cdf(marginal_mu, trace['mu'])",
-            76: "compare_cdf(marginal_sigma, trace['sigma'])",
-            77: "compare_cdf(marginal_x, trace_xs[-1])",
-            93: "compare_cdf(marginal_mu, trace['mu'])",
-            94: "compare_cdf(marginal_sigma, trace['sigma'])",
-            95: "compare_cdf(marginal_x, trace_xs[i])",
-            100: "compare_cdf(pmf, trace_xs[i])",
-            102: "trace_xs[i].mean()",
+            17: "import pymc as pm",
+            18: "model = make_model()",
+            19: "with model:",
+            21: "post = az.extract(idata)",
+            23: "az.plot_dist(idata, var_names=['mu', 'sigma'])",
+            25: "post_xs = post['xs']",
+            27: "Cdf.from_seq(post_xs[0]).plot()",
+            32: "compare_cdf(prior_mu, prior_sample['mu'])",
+            33: "compare_cdf(prior_sigma, prior_sample['sigma'])",
+            61: "pred_xs = prior_sample['xs']",
+            62: "compare_cdf(marginal_x, pred_xs[0])",
+            77: "marginal_mu = Pmf(marginal(posterior, 0), mus)",
+            78: "marginal_sigma = Pmf(marginal(posterior, 1), sig",
+            79: "marginal_x = Pmf(marginal(posterior, 2), xs)",
+            95: "compare_cdf(marginal_mu, post['mu'])",
+            96: "compare_cdf(marginal_sigma, post['sigma'])",
+            97: "compare_cdf(marginal_x, post_xs[i])",
+            102: "compare_cdf(pmf, post_xs[i])",
+            104: "diff = abs(pmf.mean() - float(post_xs[i].mean())",
         },
     )
     write_notebook(name, notebook)
@@ -360,46 +361,118 @@ def adapt_chap19_v3() -> bool:
         notebook,
         name,
         {
-            25: "import pymc as pm",
-            28: "pm.model_to_graphviz(model)",
-            31: "idata = pm.sample_prior_predictive(1000)",
-            32: "type(idata)",
-            35: "sample_prior_pymc = get_values(idata.prior['lam'])",
-            38: "plot_cdf(sample_prior_pymc,",
-            40: "sample_prior_pred_pymc = get_values(idata.prior['goals'])",
-            43: "plot_pred(sample_prior_pred_pymc,",
-            46: "with pm.Model() as model:",
-            48: "with pm.Model() as model2:",
-            50: "idata2 = pm.sample(500, **options)",
-            52: "sample_post_pymc = get_values(idata2.posterior['lam'])",
-            53: "sample_post_pymc.shape",
-            55: "plot_cdf(sample_post_pymc,",
-            58: "idata2_pred = pm.sample_posterior_predictive(idata2)",
-            60: "sample_post_pred_pymc = get_values(",
-            61: "sample_post_pred_pymc.shape",
-            65: "plot_pred(sample_post_pred_pymc,",
-            86: "with pm.Model() as model3:",
-            89: "idata3 = pm.sample(500, **options)",
-            91: "az.plot_posterior(idata3,",
-            93: "get_values(idata3.posterior['a'].mean())",
-            94: "get_values(idata3.posterior['b'].mean())",
-            96: "az.plot_posterior(get_values(idata3.posterior['sigma']))",
-            111: "with pm.Model() as model4:",
-            113: "idata4 = pm.sample(500, **options)",
-            115: "get_values(idata4.posterior['b0']).mean()",
-            117: "get_values(idata4.posterior['sigma']).mean()",
-            119: "means = [get_values(idata4.posterior[name]).mean()",
-            121: "cis = [credible_interval(get_values(idata4.posterior[name]))",
-            123: "table['Posterior mean'] = np.round(means, 3)",
-            128: "with pm.Model() as model5:",
-            130: "with pm.Model() as model6:",
-            134: "with pm.Model() as model7:",
-            143: "with pm.Model() as model8:",
-            144: "az.plot_posterior(idata8)",
-            151: "with pm.Model() as model9:",
-            152: "idata9 = pm.sample(1000)",
-            153: "az.summary(idata9)",
-            154: "az.plot_posterior(idata9)",
+            26: "import pymc as pm",
+            29: "pm.model_to_graphviz(model)",
+            32: "with model:",
+            33: "type(idata)",
+            36: "sample_prior_pymc = get_values(idata.prior['lam'",
+            39: "plot_cdf(sample_prior,",
+            41: "sample_prior_pred_pymc = get_values(idata.prior[",
+            44: "plot_pred(sample_prior_pred,",
+            47: "with pm.Model() as model:",
+            49: "with pm.Model() as model2:",
+            51: "with model2:",
+            53: "sample_post_pymc = get_values(idata2.posterior['",
+            54: "sample_post_pymc.shape",
+            56: "posterior.make_cdf().plot(label='posterior grid'",
+            59: "with model2:",
+            61: "sample_post_pred_pymc = get_values(idata2_pred.p",
+            62: "sample_post_pred_pymc.shape",
+            66: "plot_pred(sample_post_pred,",
+            87: "with pm.Model() as model3:",
+            90: "with model3:",
+            92: "with model3:",
+            94: "print('Sample mean:', get_values(idata3.posterio",
+            95: "print('Sample mean:', get_values(idata3.posterio",
+            97: "az.plot_dist(idata3, var_names=['sigma']);",
+            112: "with pm.Model() as model4:",
+            114: "with model4:",
+            116: "get_values(idata4.posterior['b0']).mean()",
+            118: "get_values(idata4.posterior['sigma']).mean()",
+            120: "means = [get_values(idata4.posterior[name]).mean",
+            122: "cis = [credible_interval(get_values(idata4.poste",
+            124: "index = columns[1:]",
+            129: "with pm.Model() as model5:",
+            131: "with pm.Model() as model6:",
+            135: "with pm.Model() as model7:",
+            144: "with pm.Model() as model8:",
+            145: "with model8:",
+            152: "with pm.Model() as model9:",
+            153: "with model9:",
+            154: "az.summary(idata9)",
+            155: "with model9:",
+        },
+    )
+    write_notebook(name, notebook)
+    return True
+
+
+def adapt_diabetes() -> bool:
+    name = "diabetes.ipynb"
+    notebook = load_notebook(name)
+    if already_prepared(notebook):
+        return False
+
+    mark_reference_only(
+        notebook,
+        name,
+        {
+            4: "import pymc as pm",
+            13: "with pm.Model(coords=coords) as model:",
+            16: "pm.model_to_graphviz(model)",
+            18: "with model:",
+            19: 'az.summary(idata, var_names=["N", "p", "mu", "k0',
+            21: 'az.plot_posterior(idata, var_names=["N", "p"])',
+            23: 'az.summary(idata, var_names=["N"], hdi_prob=0.9)',
+            29: "heterogeneity_model = make_heterogeneity_model()",
+            30: "with heterogeneity_model:",
+            32: "az.summary(",
+            33: 'az.plot_posterior(idata_het, var_names=["N", "si',
+            34: 'az.summary(idata_het, var_names=["N"], hdi_prob=',
+            36: "az.plot_density(",
+            37: 'summary_ind = az.summary(idata, var_names=["N"],',
+            40: "idata_s = fit_heterogeneity(scale)",
+        },
+    )
+    split_out_imports(
+        notebook,
+        name,
+        5,
+        moved="import pymc as pm\nimport arviz as az",
+        keep=(
+            "import numpy as np\n"
+            "import matplotlib.pyplot as plt\n"
+            "import pandas as pd\n"
+            "\n"
+            "from scipy.stats import norm\n"
+            "\n"
+            "from utils import decorate, set_pyplot_params"
+        ),
+    )
+    write_notebook(name, notebook)
+    return True
+
+
+def adapt_ordinal() -> bool:
+    name = "ordinal.ipynb"
+    notebook = load_notebook(name)
+    if already_prepared(notebook):
+        return False
+
+    mark_reference_only(
+        notebook,
+        name,
+        {
+            35: "import pymc as pm",
+            37: "pm.model_to_graphviz(model)",
+            40: "with model:",
+            41: "az.summary(idata, var_names=var_names, round_to=",
+            43: "az.plot_dist(idata, var_names=['cutpoints', 'bet",
+            45: "with model:",
+            48: "plot_bands(age_range, predicted, colors)",
+            51: "with pm.Model() as model2:",
+            52: "with model2:",
+            53: "az.summary(idata2, var_names=['cutpoints', 'beta",
         },
     )
     write_notebook(name, notebook)
@@ -553,6 +626,8 @@ ADAPTERS = (
     adapt_chap19_v3,
     adapt_chap20,
     adapt_cancer,
+    adapt_diabetes,
+    adapt_ordinal,
 )
 
 # Where the flagged cells end up, salvage insertions included. Positions rather
@@ -579,18 +654,21 @@ EXPECTED_MARKS = {
         120, 121, 122, 123,
     ],
     "hospital.ipynb": [
-        17, 18, 19, 21, 23, 25, 30, 31, 59, 60, 75, 76, 77, 93, 94, 95, 100, 102,
+        17, 18, 19, 21, 23, 25, 27, 32, 33, 61, 62, 77, 78, 79, 95, 96, 97, 102,
+        104,
     ],
     "chap19_v3.ipynb": [
-        25, 28, 31, 32, 35, 38, 40, 43, 46, 48, 50, 52, 53, 55, 58, 60, 61, 65,
-        86, 89, 91, 93, 94, 96, 111, 113, 115, 117, 119, 121, 123, 128, 130,
-        134, 143, 144, 151, 152, 153, 154,
+        26, 29, 32, 33, 36, 39, 41, 44, 47, 49, 51, 53, 54, 56, 59, 61, 62, 66,
+        87, 90, 92, 94, 95, 97, 112, 114, 116, 118, 120, 122, 124, 129, 131,
+        135, 144, 145, 152, 153, 154, 155,
     ],
     "chap20.ipynb": [
         65, 67, 69, 71, 73, 75, 77, 79, 82, 84, 86, 88, 90, 92, 96, 100, 101,
         103, 105, 107, 109,
     ],
     "cancer.ipynb": [32, 62, 63, 64],
+    "diabetes.ipynb": [4, 6, 14, 17, 19, 20, 22, 24, 30, 31, 33, 34, 35, 37, 38, 41],
+    "ordinal.ipynb": [35, 37, 40, 41, 43, 45, 48, 51, 52, 53],
 }
 
 
@@ -619,6 +697,7 @@ def validate() -> None:
         ("hepatitis.ipynb", 5, "from utils import decorate", "import pymc"),
         ("bread.ipynb", 5, "from utils import decorate", "import pymc"),
         ("redline_pymc.ipynb", 5, "from utils import decorate", "import pymc"),
+        ("diabetes.ipynb", 5, "from utils import decorate", "import pymc"),
     ):
         source = source_of(load_notebook(name)["cells"][index])
         if must_keep not in source or must_not in source:

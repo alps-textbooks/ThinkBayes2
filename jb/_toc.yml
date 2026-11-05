@@ -49,3 +49,7 @@ parts:
   - file: hepatitis
   - file: diabetes
   - file: ordinal
+- caption: Back Matter
+  chapters:
+    - file: about-this-book
+      title: About This Book
