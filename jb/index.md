@@ -1,4 +1,11 @@
-# Think Bayes 2
+---
+myst:
+  html_meta:
+    description: "Think Bayes, 2nd edition, free online: an introduction to Bayesian statistics using Python and computational methods, as notebooks you can run on Colab."
+og:description: "Think Bayes, 2nd edition, free online: an introduction to Bayesian statistics using Python and computational methods, as notebooks you can run on Colab."
+---
+
+# Think Bayes: Bayesian Statistics in Python
 
 by Allen B. Downey
 
@@ -63,10 +70,48 @@ Or use these links to run the notebooks on Colab:
 
 * [Chapter 19](https://colab.research.google.com/github/AllenDowney/ThinkBayes2/blob/master/notebooks/chap19.ipynb)
 
-* [Chapter 19 updated for PyMC version 5](https://colab.research.google.com/github/AllenDowney/ThinkBayes2/blob/master/notebooks/chap19_v3.ipynb)
+* [Chapter 19 updated for PyMC version 6](https://colab.research.google.com/github/AllenDowney/ThinkBayes2/blob/master/notebooks/chap19_v3.ipynb)
 
 * [Chapter 20](https://colab.research.google.com/github/AllenDowney/ThinkBayes2/blob/master/notebooks/chap20.ipynb)
 
 ## Examples
 
+* [The Red Line Problem](https://colab.research.google.com/github/AllenDowney/ThinkBayes2/blob/master/notebooks/redline.ipynb)
+
+* [The Red Line Problem with PyMC](https://colab.research.google.com/github/AllenDowney/ThinkBayes2/blob/master/examples/redline_pymc.ipynb)
+
+* [Estimating Vaccine Efficacy](https://colab.research.google.com/github/AllenDowney/ThinkBayes2/blob/master/examples/vaccine2.ipynb)
+
+* [Flipping USB Connectors](https://colab.research.google.com/github/AllenDowney/ThinkBayes2/blob/master/examples/usb.ipynb)
+
+* [The Left Handed Sister Problem](https://colab.research.google.com/github/AllenDowney/ThinkBayes2/blob/master/examples/sister.ipynb)
+
+* [Bayesian Dice](https://colab.research.google.com/github/AllenDowney/ThinkBayes2/blob/master/examples/bayes_dice.ipynb)
+
+* [The Emitter-Detector Problem](https://colab.research.google.com/github/AllenDowney/ThinkBayes2/blob/master/examples/radiation.ipynb)
+
+* [Grid Algorithms for Hierarchical Models](https://colab.research.google.com/github/AllenDowney/ThinkBayes2/blob/master/examples/hospital.ipynb)
+
+* [Comparing Birth Rates](https://colab.research.google.com/github/AllenDowney/ThinkBayes2/blob/master/examples/hospital_birth_rate.ipynb)
+
+* [How Many Typos?](https://colab.research.google.com/github/AllenDowney/ThinkBayes2/blob/master/examples/ok.ipynb)
+
+* [How Many Books?](https://colab.research.google.com/github/AllenDowney/ThinkBayes2/blob/master/examples/bookstore.ipynb)
+
+* [The All-Knowing Cube of Probability](https://colab.research.google.com/github/AllenDowney/ThinkBayes2/blob/master/examples/beta_binomial.ipynb)
+
+* [What's a Chartist?](https://colab.research.google.com/github/AllenDowney/ThinkBayes2/blob/master/examples/zipf.ipynb)
+
+* [The Poincaré Problem](https://colab.research.google.com/github/AllenDowney/ThinkBayes2/blob/master/examples/bread.ipynb)
+
+* [Cancer Survival Rates Are Misleading](https://colab.research.google.com/github/AllenDowney/ThinkBayes2/blob/master/examples/cancer.ipynb)
+
+* [The Raven Paradox](https://colab.research.google.com/github/AllenDowney/ThinkBayes2/blob/master/examples/raven.ipynb)
+
+* [The Frog Puzzle](https://colab.research.google.com/github/AllenDowney/ThinkBayes2/blob/master/examples/frog.ipynb)
+
 * [Tracking an Outbreak with Mark and Recapture](https://colab.research.google.com/github/AllenDowney/ThinkBayes2/blob/master/examples/hepatitis.ipynb)
+
+* [Counting Diabetes Cases with Mark and Recapture](https://colab.research.google.com/github/AllenDowney/ThinkBayes2/blob/master/examples/diabetes.ipynb)
+
+* [Ordinal Regression](https://colab.research.google.com/github/AllenDowney/ThinkBayes2/blob/master/examples/ordinal.ipynb)

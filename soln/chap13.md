@@ -1,11 +1,12 @@
 ---
 jupyter:
   jupytext:
+    formats: ipynb,md
     text_representation:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.18.1
+      jupytext_version: 1.19.5
   kernelspec:
     display_name: Python 3 (ipykernel)
     language: python
@@ -14,7 +15,12 @@ jupyter:
 
 You can order print and ebook versions of *Think Bayes 2e* from
 [Bookshop.org](https://bookshop.org/a/98697/9781492089469) and
-[Amazon](https://amzn.to/334eqGo).
+[Amazon](https://amzn.to/334eqGo) (affiliate links).
+
+If you find this book useful, please consider
+[supporting free, open educational materials](https://greenteapress.com/support/?book=tb2) from Green Tea Press.
+
+And you might like this new book-in-progress by Allen Downey, [*You Would Choose Now: Measuring America's Progress Toward Fairness and Tolerance*](https://leanpub.com/ywcn).
 
 
 # Inference

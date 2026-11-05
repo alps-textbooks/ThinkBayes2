@@ -1,11 +1,12 @@
 ---
 jupyter:
   jupytext:
+    formats: ipynb,md
     text_representation:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.18.1
+      jupytext_version: 1.19.5
   kernelspec:
     display_name: Python 3 (ipykernel)
     language: python
@@ -14,12 +15,17 @@ jupyter:
 
 You can order print and ebook versions of *Think Bayes 2e* from
 [Bookshop.org](https://bookshop.org/a/98697/9781492089469) and
-[Amazon](https://amzn.to/334eqGo).
+[Amazon](https://amzn.to/334eqGo) (affiliate links).
+
+If you find this book useful, please consider
+[supporting free, open educational materials](https://greenteapress.com/support/?book=tb2) from Green Tea Press.
+
+And you might like this new book-in-progress by Allen Downey, [*You Would Choose Now: Measuring America's Progress Toward Fairness and Tolerance*](https://leanpub.com/ywcn).
 
 <!-- #region id="MSp-NuHq537L" -->
 # MCMC
 
-[NOTE: this online version of Chapter 19 has been updated for PyMC version 5]
+[NOTE: this online version of Chapter 19 has been updated for PyMC version 6 and ArviZ version 1]
 
 For most of this book we've used grid methods to approximate posterior distributions.
 For models with one or two parameters, grid algorithms are fast and the results are precise enough for most practical purposes.
@@ -46,6 +52,19 @@ try:
 except ImportError:
     !pip install empiricaldist
     import empiricaldist
+```
+
+```python
+# On Colab, update PyMC and ArviZ
+# (this chapter requires PyMC 6 and ArviZ 1)
+# matplotlib 3.11 avoids deprecation warnings from recent versions
+# of pyparsing, which matplotlib 3.10 triggers when it renders math
+
+try:
+    import google.colab
+    !pip install --quiet --upgrade "pymc>=6" "arviz>=1" "matplotlib>=3.11"
+except ImportError:
+    pass
 ```
 
 ```python colab={"base_uri": "https://localhost:8080/"} id="gxC5h0D7537N" outputId="564c4a51-63e1-45db-c774-627d34d1b080"
@@ -253,7 +272,7 @@ type(idata)
 ```
 
 <!-- #region id="a0CiSJ-n537Y" -->
-The result is an `InferenceData` object that contains information about the sampling process and the results.
+The result is a `DataTree` object that contains information about the sampling process and the results.
 We can extract the sample of `lam` like this:
 <!-- #endregion -->
 
@@ -362,10 +381,8 @@ And instead of calling `sample_prior_predictive`, we'll call `sample`, which is 
 <!-- #endregion -->
 
 ```python colab={"base_uri": "https://localhost:8080/", "height": 57} id="UAjsqXMk537c" outputId="0979edf9-b37f-4f7c-c6e1-66488bad98c0"
-options = dict()
-
 with model2:
-    idata2 = pm.sample(500, **options)
+    idata2 = pm.sample(500, chains=2)
 ```
 
 <!-- #region id="q4Iu1faW537d" -->
@@ -378,7 +395,7 @@ I won't go into the details of how PyMC works, but here are a few things you sho
 
 * Instead of using a single Markov chain, PyMC uses multiple chains.  Then we can compare results from multiple chains to make sure they are consistent.
 
-Although we asked for a sample of 500, PyMC generated two samples of 1000, discarded half of each, and returned the remaining 1000.
+Although we asked for a sample of 500, PyMC ran two chains; each one took 1000 tuning steps, which are discarded, and then generated 500 draws, so the result contains 1000 draws in total.
 From `idata2` we can extract a sample from the posterior distribution, like this:
 <!-- #endregion -->
 
@@ -422,7 +439,7 @@ with model2:
 ```
 
 <!-- #region id="n2jFN9PM537f" -->
-The result is an `InferenceData` object that contains a sample of `goals`.
+The result is a `DataTree` object that contains a sample of `goals`.
 <!-- #endregion -->
 
 ```python id="b4Ex1vyR537f"
@@ -504,13 +521,13 @@ In the next few sections we'll replicate the analysis in this report using Bayes
 <!-- #endregion -->
 
 <!-- #region id="PA13rW79537g" -->
-The data from this report can be [downloaded from here](https://happiness-report.s3.amazonaws.com/2020/WHR20_DataForFigure2.1.xls).
+The data from this report is no longer available at its original location, so we'll use a [copy in this book's repository](https://github.com/AllenDowney/ThinkBayes2/raw/master/data/WHR20_DataForFigure2.1.xls).
 <!-- #endregion -->
 
 ```python colab={"base_uri": "https://localhost:8080/"} id="5hu64X5G537g" outputId="1635984e-3140-4914-fe58-dee2d8ea5289"
 # Get the data file
 
-download('https://happiness-report.s3.amazonaws.com/2020/WHR20_DataForFigure2.1.xls')
+download('https://github.com/AllenDowney/ThinkBayes2/raw/master/data/WHR20_DataForFigure2.1.xls')
 ```
 
 <!-- #region id="xn4IpGc0537h" -->
@@ -639,7 +656,7 @@ Now we can use this model to generate a sample from the posterior distribution.
 
 ```python colab={"base_uri": "https://localhost:8080/", "height": 57} id="400xtRjH537l" outputId="362ff411-2821-4645-e267-9d7da0075fdf"
 with model3:
-    idata3 = pm.sample(500, **options)
+    idata3 = pm.sample(500, chains=2)
 ```
 
 <!-- #region id="mE1dE4E8537l" -->
@@ -648,7 +665,7 @@ You can ignore them for now.
 
 The result is an object that contains samples from the joint posterior distribution of `a`, `b`, and `sigma`.
 
-ArviZ provides `plot_posterior`, which we can use to plot the posterior distributions of the parameters.
+ArviZ provides `plot_dist`, which we can use to plot the posterior distributions of the parameters.
 Here are the posterior distributions of slope, `a`, and intercept, `b`.
 <!-- #endregion -->
 
@@ -656,11 +673,12 @@ Here are the posterior distributions of slope, `a`, and intercept, `b`.
 import arviz as az
 
 with model3:
-    az.plot_posterior(idata3, var_names=['a', 'b']);
+    az.plot_dist(idata3, var_names=['a', 'b']);
 ```
 
 <!-- #region id="pqMZyPKF537m" -->
-The graphs show the distributions of the samples, estimated by KDE, and 94% credible intervals.  In the figure, "HDI" stands for ["highest-density interval"](https://www.sciencedirect.com/topics/mathematics/highest-density-interval).
+The graphs show the distributions of the samples, estimated by KDE, with a dot at the posterior mean and a bar showing a credible interval.
+By default, ArviZ shows an 89% equal-tailed interval (ETI), which runs from the 5.5th percentile to the 94.5th.
 
 The means of these samples are consistent with the parameters we estimated with `linregress`.
 <!-- #endregion -->
@@ -680,7 +698,7 @@ Finally, we can check the marginal posterior distribution of `sigma`
 <!-- #endregion -->
 
 ```python colab={"base_uri": "https://localhost:8080/", "height": 458} id="7oUfm1XN537o" outputId="c1c521a7-fb85-4954-f818-19fbb2099744"
-az.plot_posterior(get_values(idata3.posterior['sigma']));
+az.plot_dist(idata3, var_names=['sigma']);
 ```
 
 <!-- #region id="2cJS1cdg537o" -->
@@ -788,7 +806,7 @@ Now we can sample from the joint posterior distribution.
 
 ```python colab={"base_uri": "https://localhost:8080/", "height": 57} id="isu4ACk5537w" outputId="99c56e9b-6baa-4623-dfcb-651c4a521b4f"
 with model4:
-    idata4 = pm.sample(500, **options)
+    idata4 = pm.sample(500, chains=2)
 ```
 
 <!-- #region id="YTBi-RMa537w" -->
@@ -812,20 +830,20 @@ From `idata4` we can extract samples from the posterior distributions of the par
 <!-- #endregion -->
 
 ```python id="GHCBzG2s537y"
-param_names = ['b1', 'b3', 'b3', 'b4', 'b5', 'b6']
+param_names = ['b1', 'b2', 'b3', 'b4', 'b5', 'b6']
 
 means = [get_values(idata4.posterior[name]).mean()
          for name in param_names]
 ```
 
 <!-- #region id="I757TTZr537y" -->
-We can also compute 94% credible intervals (between the 3rd and 97th percentiles).
+We can also compute 89% credible intervals (between the 5.5th and 94.5th percentiles), to be consistent with the intervals ArviZ shows by default.
 <!-- #endregion -->
 
 ```python id="s6JIkqB4537y"
 def credible_interval(sample):
-    """Compute 94% credible interval."""
-    ci = np.percentile(sample, [3, 97])
+    """Compute 89% credible interval."""
+    ci = np.percentile(sample, [5.5, 94.5])
     return np.round(ci, 3)
 
 cis = [credible_interval(get_values(idata4.posterior[name]))
@@ -840,7 +858,7 @@ The following table summarizes the results.
 index = columns[1:]
 table = pd.DataFrame(index=index)
 table['Posterior mean'] = np.round(means, 3)
-table['94% CI'] = cis
+table['89% CI'] = cis
 table
 ```
 
@@ -888,7 +906,7 @@ What is the posterior distribution of $x$, the probability of heads?
 
 For the prior, use a beta distribution with parameters $\alpha=1$ and $\beta=1$.
 
-See [the PyMC documentation](https://docs.pymc.io/api/distributions/continuous.html) for the list of continuous distributions.
+See [the PyMC documentation](https://www.pymc.io/projects/docs/en/stable/api/distributions/continuous.html) for the list of continuous distributions.
 <!-- #endregion -->
 
 ```python id="zmQ3gkqA537z"
@@ -900,8 +918,8 @@ k_obs = 140
 with pm.Model() as model5:
     x = pm.Beta('x', alpha=1, beta=1)
     k = pm.Binomial('k', n=n, p=x, observed=k_obs)
-    idata5 = pm.sample(500, **options)
-    az.plot_posterior(idata5)
+    idata5 = pm.sample(500, chains=2)
+    az.plot_dist(idata5)
 ```
 
 <!-- #region id="ZZ0HpRRt537z" -->
@@ -915,9 +933,7 @@ Estimate the posterior distribution of `N`, the number of bears in the environme
 
 For the prior, use a discrete uniform distribution from 50 to 500.
 
-See [the PyMC documentation](https://docs.pymc.io/api/distributions/discrete.html) for the list of discrete distributions.
-
-Note: `HyperGeometric` was added to PyMC after version 3.8, so you might need to update your installation to do this exercise.
+See [the PyMC documentation](https://www.pymc.io/projects/docs/en/stable/api/distributions/discrete.html) for the list of discrete distributions.
 <!-- #endregion -->
 
 ```python id="9n58fq1R5370"
@@ -930,8 +946,8 @@ x = 4
 with pm.Model() as model6:
     N = pm.DiscreteUniform('N', 50, 500)
     y = pm.HyperGeometric('y', N=N, k=k, n=n, observed=x)
-    idata6 = pm.sample(1000, **options)
-    az.plot_posterior(idata6)
+    idata6 = pm.sample(1000, chains=2)
+    az.plot_dist(idata6)
 ```
 
 <!-- #region id="7TdpQGrY5370" -->
@@ -961,8 +977,8 @@ with pm.Model() as model7:
     lam = pm.Uniform('lam', 0.1, 10.1)
     k = pm.Uniform('k', 0.1, 5.1)
     y = pm.Weibull('y', alpha=k, beta=lam, observed=data)
-    idata7 = pm.sample(1000, **options)
-    az.plot_posterior(idata7)
+    idata7 = pm.sample(1000, chains=2)
+    az.plot_dist(idata7)
 ```
 
 <!-- #region id="HIv4c-V75371" -->
@@ -1013,14 +1029,14 @@ with pm.Model() as model8:
     mu = pm.Uniform('mu', 20, 80)
     sigma = pm.Uniform('sigma', 5, 30)
     y = pm.Normal('y', mu, sigma, observed=data)
-    idata8 = pm.sample(500, **options)
+    idata8 = pm.sample(500, chains=2)
 ```
 
 ```python id="ielGqH4D5372"
 # Solution
 
 with model8:
-    az.plot_posterior(idata8)
+    az.plot_dist(idata8)
 ```
 
 <!-- #region id="vuQwMDMZ5372" -->
@@ -1101,7 +1117,7 @@ with pm.Model() as model9:
 # Solution
 
 with model9:
-    idata9 = pm.sample(1000)
+    idata9 = pm.sample(1000, chains=2)
 ```
 
 ```python
@@ -1114,7 +1130,7 @@ az.summary(idata9)
 # Solution
 
 with model9:
-    az.plot_posterior(idata9)
+    az.plot_dist(idata9)
 ```
 
 <!-- #region tags=["remove-print"] -->

@@ -1,6 +1,7 @@
 ---
 jupyter:
   jupytext:
+    formats: ipynb,md
     text_representation:
       extension: .md
       format_name: markdown
@@ -14,7 +15,12 @@ jupyter:
 
 You can order print and ebook versions of *Think Bayes 2e* from
 [Bookshop.org](https://bookshop.org/a/98697/9781492089469) and
-[Amazon](https://amzn.to/334eqGo).
+[Amazon](https://amzn.to/334eqGo) (affiliate links).
+
+If you find this book useful, please consider
+[supporting free, open educational materials](https://greenteapress.com/support/?book=tb2) from Green Tea Press.
+
+And you might like this new book-in-progress by Allen Downey, [*You Would Choose Now: Measuring America's Progress Toward Fairness and Tolerance*](https://leanpub.com/ywcn).
 
 
 # Counting Diabetes Cases with Mark and Recapture
