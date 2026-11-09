@@ -10,8 +10,8 @@ This book teaches Bayesian statistics in Python, using discrete distributions an
 
 | At a glance | |
 |---|---|
-| **40 pages** | The book's chapters and sections |
-| **2091 code cells** | Python that runs in the browser, apart from any cells shown for reference |
+| **41 pages** | The book's chapters and sections |
+| **2136 code cells** | Python that runs in the browser, apart from any cells shown for reference |
 
 ## How to Use It
 

@@ -1,36 +1,120 @@
+# The teachers' copy of a page with solutions (each chapter, and the one
+# example that has them) is listed under that page with `audience: instructor`:
+# teachers see it, students never do, and as the page's last entry it changes
+# no student page's number.
 format: jb-book
-root: index
+root: preface
+# The parts carry no captions: Alps imports a captioned part as a unit of
+# its own, with its chapters one level down, so without them every page is a
+# top-level unit. The root is unit 0, so the Preface is 0 and Chapter N is
+# unit N.
 parts:
-- caption: Front Matter
-  chapters:
-  - file: preface
-- caption: Chapters
-  numbered: True
+- numbered: True
   chapters:
   - file: chap01
+    sections:
+    - file: chap01_soln
+      title: "Solution: Probability"
+      audience: instructor
   - file: chap02
+    sections:
+    - file: chap02_soln
+      title: "Solution: Bayes's Theorem"
+      audience: instructor
   - file: chap03
+    sections:
+    - file: chap03_soln
+      title: "Solution: Distributions"
+      audience: instructor
   - file: chap04
+    sections:
+    - file: chap04_soln
+      title: "Solution: Estimating Proportions"
+      audience: instructor
   - file: chap05
+    sections:
+    - file: chap05_soln
+      title: "Solution: Estimating Counts"
+      audience: instructor
   - file: chap06
+    sections:
+    - file: chap06_soln
+      title: "Solution: Odds and Addends"
+      audience: instructor
   - file: chap07
+    sections:
+    - file: chap07_soln
+      title: "Solution: Minimum, Maximum, and Mixture"
+      audience: instructor
   - file: chap08
+    sections:
+    - file: chap08_soln
+      title: "Solution: Poisson Processes"
+      audience: instructor
   - file: chap09
+    sections:
+    - file: chap09_soln
+      title: "Solution: Decision Analysis"
+      audience: instructor
   - file: chap10
+    sections:
+    - file: chap10_soln
+      title: "Solution: Testing"
+      audience: instructor
   - file: chap11
+    sections:
+    - file: chap11_soln
+      title: "Solution: Comparison"
+      audience: instructor
   - file: chap12
+    sections:
+    - file: chap12_soln
+      title: "Solution: Classification"
+      audience: instructor
   - file: chap13
+    sections:
+    - file: chap13_soln
+      title: "Solution: Inference"
+      audience: instructor
   - file: chap14
+    sections:
+    - file: chap14_soln
+      title: "Solution: Survival Analysis"
+      audience: instructor
   - file: chap15
+    sections:
+    - file: chap15_soln
+      title: "Solution: Mark and Recapture"
+      audience: instructor
   - file: chap16
+    sections:
+    - file: chap16_soln
+      title: "Solution: Logistic Regression"
+      audience: instructor
   - file: chap17
+    sections:
+    - file: chap17_soln
+      title: "Solution: Regression"
+      audience: instructor
   - file: chap18
+    sections:
+    - file: chap18_soln
+      title: "Solution: Conjugate Priors"
+      audience: instructor
   - file: chap19_v3
+    sections:
+    - file: chap19_v3_soln
+      title: "Solution: MCMC"
+      audience: instructor
   - file: chap20
-- caption: Examples
-  chapters:
+    sections:
+    - file: chap20_soln
+      title: "Solution: Approximate Bayesian Computation"
+      audience: instructor
+- chapters:
   - file: redline
   - file: redline_pymc
+    title: The Red Line Problem with PyMC
   - file: vaccine2
   - file: usb
   - file: sister
@@ -38,6 +122,10 @@ parts:
   - file: radiation
   - file: hospital
   - file: hospital_birth_rate
+    sections:
+    - file: hospital_birth_rate_soln
+      title: "Solution: Comparing birth rates"
+      audience: instructor
   - file: ok
   - file: bookstore
   - file: beta_binomial
@@ -49,7 +137,6 @@ parts:
   - file: hepatitis
   - file: diabetes
   - file: ordinal
-- caption: Back Matter
-  chapters:
+- chapters:
     - file: about-this-book
       title: About This Book

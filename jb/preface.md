@@ -75,6 +75,8 @@ to a good model than an exact solution to a bad model.
 
 ## Working with the code
 
+> **On Alps:** the code runs in this page, so there is nothing to install: empiricaldist and the other libraries load when a page needs them. The rest of this section is for running the notebooks on your own computer.
+
 Reading this book will only get you so far; to really understand it,
 you have to work with the code.
 The original form of this book is a series of Jupyter notebooks.

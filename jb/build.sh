@@ -9,6 +9,9 @@ pandoc -t asciidoc --wrap none --markdown-headings=atx preface.md > preface.asci
 
 # copy notebooks
 cp ../soln/chap[0-2]*.ipynb .
+# and each chapter again, with its solutions, as the teachers' copy;
+# prep_alps.py turns the first copy into the students' edition
+for f in ../soln/chap[0-2]*.ipynb; do cp "$f" "$(basename "$f" .ipynb)_soln.ipynb"; done
 cp ../soln/redline.ipynb .
 cp ../examples/redline_pymc.ipynb .
 cp ../examples/vaccine2.ipynb .
@@ -18,6 +21,8 @@ cp ../examples/bayes_dice.ipynb .
 cp ../examples/radiation.ipynb .
 cp ../examples/hospital.ipynb .
 cp ../examples/hospital_birth_rate.ipynb .
+# the one example with solutions gets a teachers' copy too, like the chapters
+cp ../examples/hospital_birth_rate.ipynb hospital_birth_rate_soln.ipynb
 cp ../examples/ok.ipynb .
 cp ../examples/bookstore.ipynb .
 cp ../examples/beta_binomial.ipynb .
